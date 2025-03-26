@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <!-- Stripe Elements -->
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .light-mode { background-color: #f8f9fa; color: #212529; }
+    .dark-mode { background-color: #343a40; color: #f8f9fa; }
+    .dark-mode .card { background-color: #2d2d2d; border-color: #444; }
+    .mode-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #343a40;
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .dark-mode .mode-toggle { background: #f8f9fa; color: #343a40; }
+  </style>
+</head>
+<body id="body" class="light-mode">
+  <!-- Navbar directly included -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'home' %}">🌟 ShopVerse</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="{% url 'product_list' %}">🛍️ Products</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'view_cart' %}">🛒 Cart</a></li>
+          {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">🚪 Logout</a></li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">🔑 Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">📝 Register</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container my-5">
+    <h1 class="mb-4">Checkout</h1>
+    <div class="card p-4">
+      <h4 class="mb-4">Total Amount: ${{ total|floatformat:2 }}</h4>
+      
+      <form id="payment-form" method="POST" action="{% url 'checkout' %}">
+        {% csrf_token %}
+        <div id="card-element" class="mb-3"></div>
+        <button id="submit-button" class="btn btn-primary btn-lg">
+          Pay Now
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Theme Toggle -->
+  <button class="mode-toggle" id="toggleButton"><i class="fas fa-moon"></i></button>
+
+  <script>
+    // Theme Toggle
+    const toggleButton = document.getElementById('toggleButton');
+    const body = document.getElementById('body');
+    
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    body.classList.add(`${savedTheme}-mode`);
+    toggleButton.innerHTML = savedTheme === 'dark' 
+      ? '<i class="fas fa-sun"></i>' 
+      : '<i class="fas fa-moon"></i>';
+
+    toggleButton.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      body.classList.toggle('light-mode');
+      
+      const theme = body.classList.contains('dark-mode') ? 'dark' : 'light';
+      localStorage.setItem('theme', theme);
+      toggleButton.innerHTML = theme === 'dark' 
+        ? '<i class="fas fa-sun"></i>' 
+        : '<i class="fas fa-moon"></i>';
+    });
+
+    // Stripe Integration
+    const stripe = Stripe('{{ STRIPE_PUBLIC_KEY }}');
+    const elements = stripe.elements();
+    const cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      
+      const {error, paymentMethod} = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+      });
+
+      if (error) {
+        alert('Payment Error: ' + error.message);
+      } else {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.setAttribute('type', 'hidden');
+        hiddenInput.setAttribute('name', 'stripePaymentMethod');
+        hiddenInput.setAttribute('value', paymentMethod.id);
+        form.appendChild(hiddenInput);
+        form.submit();
+      }
+    });
+  </script>
+
+  <!-- Bootstrap Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
