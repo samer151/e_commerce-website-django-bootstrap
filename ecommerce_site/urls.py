@@ -7,12 +7,12 @@ from store.views import register, CustomLoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('store.urls')),  # Include store app URLs
+    path('', include('store.urls')),  
     path('login/', CustomLoginView.as_view(template_name='store/login.html'), name='login'),
     path('register/', register, name='register'),
     path('logout/', LogoutView.as_view(), name='logout'),
 ]
 
-# ✅ Serve media files **only in DEBUG mode**
+# Serve media files **only in DEBUG mode**
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

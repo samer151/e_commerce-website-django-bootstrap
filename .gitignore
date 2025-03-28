@@ -1,0 +1,17 @@
+/venv
+/.vscode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+.env
+*.log
+*.pot
+*.py[co]
+*.sw[op]
+.DS_Store
+settings/local.py
+media/
+staticfiles/
+.env

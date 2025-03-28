@@ -1,6 +1,6 @@
 # store/urls.py
 from django.urls import path
-from . import views  # Importer les vues depuis le fichier views.py de l'app store
+from . import views  
 
 urlpatterns = [
     path('', views.home, name='home'),

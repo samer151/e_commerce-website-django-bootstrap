@@ -181,7 +181,6 @@
     </div>
 </div>
    <!-- Carousel Section -->
- <!-- Updated Carousel Section -->
 <div class="container mt-5 mb-5">
   <h2 class="text-center mb-4">🛒 Popular Items</h2>
   <div id="cartCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -214,7 +213,7 @@
   <div class="container mt-5">
     <h2 class="text-center mb-4">🔥 Featured Products</h2>
     <div class="row">
-      {% for product in products %}  <!-- Changed from featured_products to products -->
+      {% for product in products %}  
       <div class="col-md-4 mb-4">
         <div class="card product-card">
           {% if product.image %}

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
 from .models import Product, Cart, UserProfile, CartItem
 import stripe
-from django.db.models import Q  # Add this import
+from django.db.models import Q  
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
@@ -35,7 +35,7 @@ def login_view(request):
 # Register view
 def register(request):
     if request.method == "POST":
-        form = CustomUserCreationForm(request.POST)  # Changed from UserCreationForm to CustomUserCreationForm
+        form = CustomUserCreationForm(request.POST)  
         if form.is_valid():
             # Save the user
             form.save()
